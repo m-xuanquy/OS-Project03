@@ -18,6 +18,10 @@ struct context {
   uint64 s11;
 };
 
+struct usyscall {
+  int pid;
+};
+
 // Per-CPU state.
 struct cpu {
   struct proc *proc;          // The process running on this cpu, or null.
@@ -104,4 +108,6 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+
+  struct usyscall *usyscall;
 };

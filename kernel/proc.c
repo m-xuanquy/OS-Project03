@@ -132,6 +132,16 @@ found:
     return 0;
   }
 
+  // Allocate memory for the shared usyscall page.
+  p->usyscall = (struct usyscall *)kalloc();
+  if(p->usyscall == 0){
+    freeproc(p);
+    release(&p->lock);
+    return 0;
+  }
+  memset(p->usyscall, 0, PGSIZE); // Clear the memory
+  p->usyscall->pid = p->pid;      // Store the PID in usyscall
+
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -169,6 +179,10 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  if(p->usyscall){
+    kfree((void*)p->usyscall);
+    p->usyscall = 0;
+  }
 }
 
 // Create a user page table for a given process, with no user memory,
